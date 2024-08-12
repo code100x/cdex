@@ -2,11 +2,16 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { PrimaryButton, TabButton } from "./Button";
-import { useEffect, useState } from "react";
-import { TokenWithbalance, useTokens } from "../api/hooks/useTokens";
-import { TokenList } from "./TokenList";
+import { useState } from "react";
+import { useTokens } from "../api/hooks/useTokens";
+
 import { Swap } from "./Swap";
+import { Assets } from "./Assets";
+
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import ProfileCardSkeleton from "./skeletons/ProfileCardSkeleton";
+
 
 type Tab = "tokens" | "send" | "add_funds" | "swap" | "withdraw"
 const tabs: {id: Tab; name: string}[] = [
@@ -26,10 +31,7 @@ export const ProfileCard = ({publicKey}: {
     const { tokenBalances, loading } = useTokens(publicKey);
 
     if (session.status === "loading") {
-        // TODO: replace with a skeleton
-        return <div>
-            Loading...
-        </div>
+        return <ProfileCardSkeleton />
     }
 
     if (!session.data?.user) {
@@ -43,10 +45,18 @@ export const ProfileCard = ({publicKey}: {
                 image={session.data?.user?.image ?? ""} 
                 name={session.data?.user?.name ?? ""} 
             />
-            <div className="w-full flex px-10">
-                {tabs.map(tab => <TabButton key={tab.id} active={tab.id === selectedTab} onClick={() => {
-                    setSelectedTab(tab.id)
-                }}>{tab.name}</TabButton>)}
+            <div className="w-full flex justify-center gap-x-2 pb-5">
+                {
+                    tabs.map((tab) => 
+                    <Button
+                        variant={tab.id === selectedTab ? "default" : "outline"}
+                        size={"lg"}
+                        key={tab.id}
+                        onClick={() => {setSelectedTab(tab.id)}}
+                    >
+                        {tab.name}
+                    </Button>
+                )}
             </div>
             
             <div className={`${selectedTab === "tokens" ? "visible" : "hidden"}`}><Assets tokenBalances={tokenBalances} loading={loading} publicKey={publicKey} /> </div>
@@ -60,59 +70,6 @@ export const ProfileCard = ({publicKey}: {
 function Warning() {
     return <div className="bg-slate-50 py-32 px-10 flex justify-center">
         We dont yet support this feature
-    </div>
-}
-
-function Assets({publicKey, tokenBalances, loading}: {
-    publicKey: string;
-    tokenBalances: {
-        totalBalance: number,
-        tokens: TokenWithbalance[]
-    } | null;
-    loading: boolean;
-}) {
-    const [copied, setCopied] = useState(false);
-
-    useEffect(() => {
-        if (copied) {
-            let timeout = setTimeout(() => {
-                setCopied(false)
-            }, 3000)
-            return () => {
-                clearTimeout(timeout);
-            }
-        }
-    }, [copied])
-
-    if (loading) {
-        return "Loading..."
-    }
-
-    return <div className="text-slate-500">
-        <div className="mx-12 py-2">
-            Account assets
-        </div>
-        <div className="flex justify-between mx-12">
-            <div className="flex">
-                <div className="text-5xl font-bold text-black">
-                    ${tokenBalances?.totalBalance}
-                </div>
-                <div className="font-slate-500 font-bold text-3xl flex flex-col justify-end pb-0 pl-2">
-                    USD
-                </div>
-            </div>
-
-            <div>
-                <PrimaryButton onClick={() => {
-                    navigator.clipboard.writeText(publicKey)
-                    setCopied(true)
-                }}>{copied ? "Copied" : "Your wallet address"}</PrimaryButton>
-            </div>
-        </div>
-
-        <div className="pt-4 bg-slate-50 p-12 mt-4">
-            <TokenList tokens={tokenBalances?.tokens || []} />
-        </div>
     </div>
 }
 

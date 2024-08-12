@@ -2,8 +2,8 @@
 import { ReactNode, useEffect, useState } from "react"
 import { SUPPORTED_TOKENS, TokenDetails } from "../lib/tokens"
 import { TokenWithbalance } from "../api/hooks/useTokens";
-import { PrimaryButton } from "./Button";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
 
 export function Swap({ publicKey, tokenBalances }: {
     publicKey: string;
@@ -76,7 +76,7 @@ export function Swap({ publicKey, tokenBalances }: {
          }} selectedToken={quoteAsset} title={"You receive"}  topBorderEnabled={false} bottomBorderEnabled={true} />
 
          <div className="flex justify-end pt-4">
-            <PrimaryButton onClick={async () => {
+            <Button size="lg" onClick={async () => {
                 // trigger swap
                 try {
                     const res = await axios.post("/api/swap", { 
@@ -88,7 +88,7 @@ export function Swap({ publicKey, tokenBalances }: {
                 } catch(e) {
                     alert("Error while sending a txn")
                 }
-            }}>Swap</PrimaryButton>
+            }}>Swap</Button>
         </div>
     </div>
 }

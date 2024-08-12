@@ -10,14 +10,22 @@
   },
   "dependencies": {
     "@prisma/client": "^5.17.0",
+    "@radix-ui/react-dialog": "^1.1.1",
+    "@radix-ui/react-slot": "^1.1.0",
     "@solana/spl-token": "^0.4.8",
     "@solana/web3.js": "^1.95.2",
     "axios": "^1.7.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.427.0",
     "next": "14.2.5",
     "next-auth": "^4.24.7",
+    "next-qrcode": "^2.5.1",
     "prisma": "^5.17.0",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "tailwind-merge": "^2.5.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "^20",

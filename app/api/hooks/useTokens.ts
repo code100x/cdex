@@ -19,7 +19,7 @@ export function useTokens(address: string) {
             .then(res => {
                 setTokenBalances(res.data);
                 setLoading(false)
-            })
+            }).catch(err => console.log(err))
     }, [])
 
     return {

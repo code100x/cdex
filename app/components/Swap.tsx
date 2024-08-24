@@ -5,6 +5,8 @@ import { TokenWithbalance } from "../api/hooks/useTokens";
 import { PrimaryButton } from "./Button";
 import axios from "axios";
 
+const DELAY = 1000;
+
 export function Swap({ publicKey, tokenBalances }: {
     publicKey: string;
     tokenBalances: {
@@ -19,6 +21,15 @@ export function Swap({ publicKey, tokenBalances }: {
     const [fetchingQuote, setFetchingQuote] = useState(false);
     const [quoteResponse, setQuoteResponse] = useState(null);
 
+    const func = () => {
+        axios.get(`https://quote-api.jup.ag/v6/quote?inputMint=${baseAsset.mint}&outputMint=${quoteAsset.mint}&amount=${Number(baseAmount) * (10 ** baseAsset.decimals)}&slippageBps=50`)
+            .then(res => {
+                setQuoteAmount((Number(res.data.outAmount) / Number(10 ** quoteAsset.decimals)).toString())
+                setFetchingQuote(false);
+                setQuoteResponse(res.data);
+            })
+    }
+
     // TODO: Use async useEffects that u can cancel
     // Use debouncing
     useEffect(() => {
@@ -26,13 +37,11 @@ export function Swap({ publicKey, tokenBalances }: {
             return;
         }
         setFetchingQuote(true);
-        axios.get(`https://quote-api.jup.ag/v6/quote?inputMint=${baseAsset.mint}&outputMint=${quoteAsset.mint}&amount=${Number(baseAmount) * (10 ** baseAsset.decimals)}&slippageBps=50`)
-            .then(res => {
-                setQuoteAmount((Number(res.data.outAmount) / Number(10 ** quoteAsset.decimals)).toString())
-                setFetchingQuote(false);
-                setQuoteResponse(res.data);
-            })
-
+        const timeout = setTimeout(func, DELAY);
+        
+        return () => {
+            clearTimeout(timeout);
+        }
     }, [baseAsset, quoteAsset, baseAmount])
 
     return <div className="p-12 bg-slate-50">
